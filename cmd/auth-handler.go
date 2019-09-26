@@ -27,6 +27,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"fmt"
 
 	jwtgo "github.com/dgrijalva/jwt-go"
 	xhttp "github.com/minio/minio/cmd/http"
@@ -121,7 +122,10 @@ func getRequestAuthType(r *http.Request) authType {
 // checkAdminRequestAuthType checks whether the request is a valid signature V2 or V4 request.
 // It does not accept presigned or JWT or anonymous requests.
 func checkAdminRequestAuthType(ctx context.Context, r *http.Request, region string) APIErrorCode {
+	fmt.Println("checkAdminRequestAuthType")
 	s3Err := ErrAccessDenied
+	fmt.Println(getRequestAuthType(r))
+	fmt.Println(authTypeSigned)
 	if _, ok := r.Header[xhttp.AmzContentSha256]; ok &&
 		getRequestAuthType(r) == authTypeSigned && !skipContentSha256Cksum(r) {
 		// We only support admin credentials to access admin APIs.

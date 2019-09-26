@@ -22,6 +22,7 @@ import { connect } from "react-redux"
 import logo from "../../img/logo.svg"
 import BucketSearch from "../buckets/BucketSearch"
 import BucketList from "../buckets/BucketList"
+import AdminAction from "../admin/AdminAction"
 import Host from "./Host"
 import * as actionsCommon from "./actions"
 import web from "../web"
@@ -33,6 +34,27 @@ export const SideBar = ({ sidebarOpen, clickOutside }) => {
     }
     clickOutside()
   }
+  // TODO: Hardcoded value
+  const isAdminUser = true;
+
+  if (isAdminUser){
+    return (<ClickOutHandler onClickOut={onClickOut}>
+      <div
+        className={classNames({
+          "fe-sidebar": true,
+          toggled: sidebarOpen,
+          isAdmin: true
+        })}>
+        <div className="fes-header clearfix hidden-sm hidden-xs">
+          <img src={logo} alt="" />
+          <h2>MinIO Admin Console</h2>
+        </div>
+        {web.LoggedIn() && <AdminAction />}
+        <Host />
+      </div>
+    </ClickOutHandler>
+    )
+  } 
   return (
     <ClickOutHandler onClickOut={onClickOut}>
       <div

@@ -9,6 +9,10 @@
 	overflow: hidden;
 	padding: 25px;
 
+	&.isAdmin {
+		background-color: @fe-sidebar-admin-bg;
+	}
+
 	@media(min-width: @screen-md-min) {
 		.translate3d(0, 0, 0);
 	}
@@ -132,6 +136,36 @@
 	&:hover .scrollbar-vertical {
 		opacity: 1;
 	}
+}
+
+/*Admin actions*/
+.fesl-admin-act {
+	cursor: pointer;
+	margin: -10px -25px;
+	opacity: 0.9;
+	.transition(opacity);
+	.transition-duration(300ms);
+
+	& li {
+		position: relative;
+		& > a {
+			padding: 15px 25px;
+			width: 400px;
+			display: inline-block;
+			word-wrap: break-word;
+		}
+
+		&:hover{
+				background-color: rgba(0,0,0,0.1);
+				opacity: 0.8;
+			}
+	}
+
+	li {
+		list-style-type: none;
+	}
+
+
 }
 
 /* Dropdown */

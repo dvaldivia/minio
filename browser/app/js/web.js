@@ -69,6 +69,16 @@ class Web {
         return res
       })
   }
+  // Admin only actions
+  AdminService(args) {
+    return this.makeCall('AdminService', args)
+  }
+  AdminUpdate() {
+    return this.makeCall('AdminUpdate')
+  }
+  AdminInfo() {
+    return this.makeCall('AdminInfo')
+  }
   Logout() {
     storage.removeItem('token')
   }
