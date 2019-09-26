@@ -221,6 +221,18 @@ func (args *PresignedGetArgs) ToKeyValue() KeyValueMap {
 	return km
 }
 
+// ToKeyValue implementation for ServiceActionArgs
+func (args *ServiceActionArgs) ToKeyValue() KeyValueMap {
+	km := KeyValueMap{}
+	return km
+}
+
+// ToKeyValue implementation for AdminUpdateArgs
+func (args *AdminUpdateArgs) ToKeyValue() KeyValueMap {
+	km := KeyValueMap{}
+	return km
+}
+
 // newWebContext creates a context with ReqInfo values from the given
 // http request and api name.
 func newWebContext(r *http.Request, args ToKeyValuer, api string) context.Context {

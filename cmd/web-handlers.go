@@ -29,6 +29,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"errors"
 
 	"github.com/dustin/go-humanize"
 	"github.com/gorilla/mux"
@@ -49,6 +50,7 @@ import (
 	iampolicy "github.com/minio/minio/pkg/iam/policy"
 	"github.com/minio/minio/pkg/ioutil"
 	"github.com/minio/minio/pkg/policy"
+	"github.com/minio/minio/pkg/madmin"
 )
 
 // WebGenericArgs - empty struct for calls that don't accept arguments
@@ -74,6 +76,7 @@ type ServerInfoRep struct {
 
 // ServerInfo - get server info.
 func (web *webAPIHandlers) ServerInfo(r *http.Request, args *WebGenericArgs, reply *ServerInfoRep) error {
+	fmt.Printf("ServerInfo called")
 	ctx := newWebContext(r, args, "webServerInfo")
 	_, owner, authErr := webRequestAuthenticate(r)
 	if authErr != nil {
@@ -145,6 +148,7 @@ type MakeBucketArgs struct {
 
 // MakeBucket - creates a new bucket.
 func (web *webAPIHandlers) MakeBucket(r *http.Request, args *MakeBucketArgs, reply *WebGenericRep) error {
+	fmt.Printf("MakeBucket called")
 	ctx := newWebContext(r, args, "webMakeBucket")
 	objectAPI := web.ObjectAPI()
 	if objectAPI == nil {
@@ -1814,6 +1818,224 @@ func presignedGet(host, bucket, object string, expiry int64, creds auth.Credenti
 
 	// Construct the final presigned URL.
 	return host + s3utils.EncodePath(path) + "?" + queryStr + "&" + xhttp.AmzSignature + "=" + signature
+}
+
+// MinIO Admin handlers
+// ServiceActionArgs - Service Action arguments.
+type ServiceActionArgs struct {
+	Action string `json:"action"`
+}
+
+// AdminService admin task
+func (web *webAPIHandlers) AdminService(r *http.Request, args *ServiceActionArgs, reply *WebGenericRep) error {
+	fmt.Println("AdminService called ")
+	// fmt.Println("args.Action: ", args.Action)
+	ctx := newWebContext(r, args, "webAdminService")
+	action := args.Action
+
+	// TODO: validate Admin Requirements
+	_, _, authErr := webRequestAuthenticate(r)
+	if authErr != nil {
+		return toJSONError(ctx, authErr)
+	}
+
+	// TODO: abstract this
+	// Get current object layer instance.
+	objectAPI := newObjectLayerFn()
+	if objectAPI == nil || globalNotificationSys == nil || globalIAMSys == nil {
+		return toJSONError(ctx, errors.New("Create better error "))
+	}
+
+	// // Validate request signature.
+	// adminAPIErr := checkAdminRequestAuthType(ctx, r, "")
+	// if adminAPIErr != ErrNone {
+	// 	return toJSONError(ctx, errors.New("Unauthorized to perform this action"))
+	// }
+
+	var serviceSig serviceSignal
+	switch madmin.ServiceAction(action) {
+		case madmin.ServiceActionRestart:
+			serviceSig = serviceRestart
+		case madmin.ServiceActionStop:
+			serviceSig = serviceStop
+		default:
+			return toJSONError(ctx, errors.New("Unrecognized service action: " + action + " requested"))
+	}
+
+	// Notify all other MinIO peers signal service.
+	for _, nerr := range globalNotificationSys.SignalService(serviceSig) {
+		if nerr.Err != nil {
+			logger.GetReqInfo(ctx).SetTags("peerAddress", nerr.Host.String())
+			logger.LogIf(ctx, nerr.Err)
+		}
+	}
+
+	// Call service action
+	globalServiceSignalCh <- serviceSig
+	
+	reply.UIVersion = browser.UIVersion
+	return nil
+}
+
+// AdminUpdateArgs - Service Update arguments.
+type AdminUpdateArgs struct {
+	UpdateUrl string `json:"updateURL"`
+}
+
+// AdminUpdateRep - Service Update reply.
+type AdminUpdateRep struct {
+	UpdateResponse madmin.ServerUpdateStatus
+	UIVersion string
+}
+
+// Admin Update admin task
+func (web *webAPIHandlers) AdminUpdate(r *http.Request, args *AdminUpdateArgs, reply *AdminUpdateRep) error {
+	fmt.Println("AdminUpdate called ")
+	ctx := newWebContext(r, args, "webAdminUpdate")
+	updateURL := args.UpdateUrl
+	var sha256Hex string
+	var latestReleaseTime time.Time
+	mode := getMinioMode()
+
+	// TODO: validate Admin Requirements
+	_, _, authErr := webRequestAuthenticate(r)
+	if authErr != nil {
+		return toJSONError(ctx, authErr)
+	}
+
+	// TODO: abstract this
+	// Get current object layer instance.
+	objectAPI := newObjectLayerFn()
+	if objectAPI == nil || globalNotificationSys == nil || globalIAMSys == nil {
+		return toJSONError(ctx, errors.New("Create better error "))
+	}
+
+	// // Validate request signature.
+	// adminAPIErr := checkAdminRequestAuthType(ctx, r, "")
+	// if adminAPIErr != ErrNone {
+	// 	return toJSONError(ctx, errors.New("Unauthorized to perform this action"))
+	// }
+
+	if globalInplaceUpdateDisabled {
+		// if MINIO_UPDATE=off - inplace update is disabled, mostly
+		// in containers.
+		return toJSONError(ctx, errors.New("MethodNotAllowed"))
+	}
+
+	if updateURL != "" {
+		u, err := url.Parse(updateURL)
+		if err != nil {
+			return toJSONError(ctx, err)
+		}
+
+		content, err := downloadReleaseURL(updateURL, updateTimeout, mode)
+		if err != nil {
+			return toJSONError(ctx, err)
+		}
+
+		sha256Hex, latestReleaseTime, err = parseReleaseData(content)
+		if err != nil {
+			return toJSONError(ctx, err)
+		}
+
+		if runtime.GOOS == "windows" {
+			u.Path = path.Dir(u.Path) + "minio.exe"
+		} else {
+			u.Path = path.Dir(u.Path) + "minio"
+		}
+
+		updateURL = u.String()
+	}
+
+	for _, nerr := range globalNotificationSys.ServerUpdate(updateURL, sha256Hex, latestReleaseTime) {
+		if nerr.Err != nil {
+			logger.GetReqInfo(ctx).SetTags("peerAddress", nerr.Host.String())
+			logger.LogIf(ctx, nerr.Err)
+		}
+	}
+
+	updateStatus, err := updateServer(updateURL, sha256Hex, latestReleaseTime)
+	if err != nil {
+		return toJSONError(ctx, err)
+	}
+
+	// Marshal API response
+	// _, err := json.Marshal(updateStatus)
+	// if err != nil {
+	// 	return toJSONError(ctx, err)
+	// }
+	
+	if updateStatus.CurrentVersion != updateStatus.UpdatedVersion {
+		// We did upgrade - restart all services.
+		globalServiceSignalCh <- serviceRestart
+	}
+
+	// TODO: render better
+	reply.UpdateResponse = updateStatus
+	reply.UIVersion = browser.UIVersion
+	fmt.Println("finished")
+	return nil
+}
+
+// AdminInfoRep - Service Info reply.
+type AdminInfoRep struct {
+	ServerInformation []ServerInfo
+	UIVersion string `json:"uiVersion"`
+}
+
+// AdminInfo admin task
+func (web *webAPIHandlers) AdminInfo(r *http.Request, args *WebGenericArgs, reply *AdminInfoRep) error {
+	fmt.Println("AdminInfo called ")
+	// fmt.Println("args.Action: ", args.Action)
+	ctx := newWebContext(r, args, "webAdminService")
+
+	// TODO: validate Admin Requirements
+	_, _, authErr := webRequestAuthenticate(r)
+	if authErr != nil {
+		return toJSONError(ctx, authErr)
+	}
+
+	// TODO: abstract this
+	// Get current object layer instance.
+	objectAPI := newObjectLayerFn()
+	if objectAPI == nil || globalNotificationSys == nil || globalIAMSys == nil {
+		return toJSONError(ctx, errors.New("Create better error "))
+	}
+
+	// // Validate request signature.
+	// adminAPIErr := checkAdminRequestAuthType(ctx, r, "")
+	// if adminAPIErr != ErrNone {
+	// 	return toJSONError(ctx, errors.New("Unauthorized to perform this action"))
+	// }
+
+	serverInfo := globalNotificationSys.ServerInfo(ctx)
+	// Once we have received all the ServerInfo from peers
+	// add the local peer server info as well.
+	serverInfo = append(serverInfo, ServerInfo{
+		Addr: getHostName(r),
+		Data: &ServerInfoData{
+			StorageInfo: objectAPI.StorageInfo(ctx),
+			ConnStats:   globalConnStats.toServerConnStats(),
+			HTTPStats:   globalHTTPStats.toServerHTTPStats(),
+			Properties: ServerProperties{
+				Uptime:       UTCNow().Sub(globalBootTime),
+				Version:      Version,
+				CommitID:     CommitID,
+				DeploymentID: globalDeploymentID,
+				SQSARN:       globalNotificationSys.GetARNList(),
+				Region:       globalServerConfig.GetRegion(),
+			},
+		},
+	})
+
+	// Marshal API response
+	// _, err := json.Marshal(updateStatus)
+	// if err != nil {
+	// 	return toJSONError(ctx, err)
+	// }
+	reply.ServerInformation = serverInfo
+	reply.UIVersion = browser.UIVersion
+	return nil
 }
 
 // toJSONError converts regular errors into more user friendly

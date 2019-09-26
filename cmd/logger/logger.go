@@ -88,6 +88,9 @@ var matchingFuncNames = [...]string{
 	"cmd.(*webAPIHandlers).PresignedGet",
 	"cmd.(*webAPIHandlers).ServerInfo",
 	"cmd.(*webAPIHandlers).StorageInfo",
+	"cmd.(*webAPIHandlers).AdminService",
+	"cmd.(*webAPIHandlers).AdminUpdate",
+	"cmd.(*webAPIHandlers).AdminInfo",
 	// add more here ..
 }
 
