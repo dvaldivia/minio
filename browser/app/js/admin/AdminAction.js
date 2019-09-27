@@ -18,6 +18,7 @@ import React from "react"
 import { connect } from "react-redux"
 import web from "../web"
 import * as alertActions from "../alert/actions"
+import {Link} from "react-router-dom";
 
 export class AdminAction extends React.Component {
   constructor(props) {
@@ -90,10 +91,30 @@ export class AdminAction extends React.Component {
   }
   render() {
     return (
-      <div className="fesl-admin-act"> 
+      <div className="fesl-admin-act">
+        <li >
+          <Link to="/a/server">
+            Server
+          </Link>
+        </li>
+        <li >
+          <Link to="/a/users">
+            Users
+          </Link>
+        </li>
+        <li >
+          <Link to="/a/groups">
+            Groups
+          </Link>
+        </li>
+        <li >
+          <Link to="/a/policies">
+            Policies
+          </Link>
+        </li>
         <li >
           <a onClick={this.adminTasks.bind(this, 'service-stop')}>
-            <i className="fas fa-power-off fa-fw" aria-hidden="true" /> Stop all MinIO servers 
+            <i className="fas fa-power-off fa-fw" aria-hidden="true" /> Stop all MinIO servers
           </a>
         </li>
         <li >

@@ -19,6 +19,7 @@ package cmd
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -29,7 +30,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"errors"
 
 	"github.com/dustin/go-humanize"
 	"github.com/gorilla/mux"
@@ -49,8 +49,8 @@ import (
 	"github.com/minio/minio/pkg/hash"
 	iampolicy "github.com/minio/minio/pkg/iam/policy"
 	"github.com/minio/minio/pkg/ioutil"
-	"github.com/minio/minio/pkg/policy"
 	"github.com/minio/minio/pkg/madmin"
+	"github.com/minio/minio/pkg/policy"
 )
 
 // WebGenericArgs - empty struct for calls that don't accept arguments
@@ -1854,12 +1854,12 @@ func (web *webAPIHandlers) AdminService(r *http.Request, args *ServiceActionArgs
 
 	var serviceSig serviceSignal
 	switch madmin.ServiceAction(action) {
-		case madmin.ServiceActionRestart:
-			serviceSig = serviceRestart
-		case madmin.ServiceActionStop:
-			serviceSig = serviceStop
-		default:
-			return toJSONError(ctx, errors.New("Unrecognized service action: " + action + " requested"))
+	case madmin.ServiceActionRestart:
+		serviceSig = serviceRestart
+	case madmin.ServiceActionStop:
+		serviceSig = serviceStop
+	default:
+		return toJSONError(ctx, errors.New("Unrecognized service action: "+action+" requested"))
 	}
 
 	// Notify all other MinIO peers signal service.
@@ -1872,7 +1872,7 @@ func (web *webAPIHandlers) AdminService(r *http.Request, args *ServiceActionArgs
 
 	// Call service action
 	globalServiceSignalCh <- serviceSig
-	
+
 	reply.UIVersion = browser.UIVersion
 	return nil
 }
@@ -1885,7 +1885,7 @@ type AdminUpdateArgs struct {
 // AdminUpdateRep - Service Update reply.
 type AdminUpdateRep struct {
 	UpdateResponse madmin.ServerUpdateStatus
-	UIVersion string
+	UIVersion      string
 }
 
 // Admin Update admin task
@@ -1964,7 +1964,7 @@ func (web *webAPIHandlers) AdminUpdate(r *http.Request, args *AdminUpdateArgs, r
 	// if err != nil {
 	// 	return toJSONError(ctx, err)
 	// }
-	
+
 	if updateStatus.CurrentVersion != updateStatus.UpdatedVersion {
 		// We did upgrade - restart all services.
 		globalServiceSignalCh <- serviceRestart
@@ -1980,7 +1980,7 @@ func (web *webAPIHandlers) AdminUpdate(r *http.Request, args *AdminUpdateArgs, r
 // AdminInfoRep - Service Info reply.
 type AdminInfoRep struct {
 	ServerInformation []ServerInfo
-	UIVersion string `json:"uiVersion"`
+	UIVersion         string `json:"uiVersion"`
 }
 
 // AdminInfo admin task

@@ -18,7 +18,7 @@ import web from "../web"
 import history from "../history"
 import * as alertActions from "../alert/actions"
 import * as objectsActions from "../objects/actions"
-import { pathSlice } from "../utils"
+import {pathSlice} from "../utils"
 
 export const SET_LIST = "buckets/SET_LIST"
 export const ADD = "buckets/ADD"
@@ -30,16 +30,18 @@ export const SHOW_BUCKET_POLICY = "buckets/SHOW_BUCKET_POLICY"
 export const SET_POLICIES = "buckets/SET_POLICIES"
 
 export const fetchBuckets = () => {
-  return function(dispatch) {
+  return function (dispatch, getState) {
     return web.ListBuckets().then(res => {
       const buckets = res.buckets ? res.buckets.map(bucket => bucket.name) : []
       dispatch(setList(buckets))
       if (buckets.length > 0) {
-        const { bucket, prefix } = pathSlice(history.location.pathname)
+        const {bucket, prefix} = pathSlice(history.location.pathname)
         if (bucket && buckets.indexOf(bucket) > -1) {
           dispatch(selectBucket(bucket, prefix))
         } else {
-          dispatch(selectBucket(buckets[0]))
+          if (!getState().admin.isAdmin) {
+            dispatch(selectBucket(buckets[0]))
+          }
         }
       } else {
         dispatch(selectBucket(""))
@@ -64,7 +66,7 @@ export const setFilter = filter => {
 }
 
 export const selectBucket = (bucket, prefix) => {
-  return function(dispatch) {
+  return function (dispatch) {
     dispatch(setCurrentBucket(bucket))
     dispatch(objectsActions.selectPrefix(prefix || ""))
   }
@@ -78,7 +80,7 @@ export const setCurrentBucket = bucket => {
 }
 
 export const makeBucket = bucket => {
-  return function(dispatch) {
+  return function (dispatch) {
     return web
       .MakeBucket({
         bucketName: bucket
@@ -99,7 +101,7 @@ export const makeBucket = bucket => {
 }
 
 export const deleteBucket = bucket => {
-  return function(dispatch) {
+  return function (dispatch) {
     return web
       .DeleteBucket({
         bucketName: bucket
@@ -114,7 +116,7 @@ export const deleteBucket = bucket => {
         dispatch(removeBucket(bucket))
         dispatch(fetchBuckets())
       })
-      .catch(err => { 
+      .catch(err => {
         dispatch(
           alertActions.set({
             type: "danger",
@@ -146,14 +148,14 @@ export const hideMakeBucketModal = () => ({
 })
 
 export const fetchPolicies = bucket => {
-  return function(dispatch) {
+  return function (dispatch) {
     return web
       .ListAllBucketPolicies({
         bucketName: bucket
       })
       .then(res => {
         let policies = res.policies
-        if(policies)
+        if (policies)
           dispatch(setPolicies(policies))
         else
           dispatch(setPolicies([]))

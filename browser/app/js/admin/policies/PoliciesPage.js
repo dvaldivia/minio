@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-import { createStore, applyMiddleware } from "redux"
-import thunkMiddleware from "redux-thunk"
-import reducers from "../reducers"
-import { composeWithDevTools } from 'redux-devtools-extension';
+import React from "react"
 
-
-const createStoreWithMiddleware = composeWithDevTools(applyMiddleware(thunkMiddleware))(createStore)
-
-export default function configureStore(initialState) {
-  const store = createStoreWithMiddleware(reducers, initialState)
-  return store
+export class PoliciesPage extends React.Component {
+  render() {
+    return (
+      <div>
+        <h1>Policies</h1>
+        <p>mc policies here</p>
+      </div>
+    )
+  }
 }
+
+
+export default PoliciesPage

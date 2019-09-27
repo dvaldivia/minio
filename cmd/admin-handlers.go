@@ -189,14 +189,14 @@ func (a adminAPIHandlers) ServiceActionHandler(w http.ResponseWriter, r *http.Re
 
 	var serviceSig serviceSignal
 	switch madmin.ServiceAction(action) {
-		case madmin.ServiceActionRestart:
-			serviceSig = serviceRestart
-		case madmin.ServiceActionStop:
-			serviceSig = serviceStop
-		default:
-			logger.LogIf(ctx, fmt.Errorf("Unrecognized service action %s requested", action))
-			writeErrorResponseJSON(ctx, w, errorCodes.ToAPIErr(ErrMalformedPOSTRequest), r.URL)
-			return
+	case madmin.ServiceActionRestart:
+		serviceSig = serviceRestart
+	case madmin.ServiceActionStop:
+		serviceSig = serviceStop
+	default:
+		logger.LogIf(ctx, fmt.Errorf("Unrecognized service action %s requested", action))
+		writeErrorResponseJSON(ctx, w, errorCodes.ToAPIErr(ErrMalformedPOSTRequest), r.URL)
+		return
 	}
 
 	// Notify all other MinIO peers signal service.
