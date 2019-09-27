@@ -23,11 +23,11 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"strings"
-	"fmt"
 
 	jwtgo "github.com/dgrijalva/jwt-go"
 	xhttp "github.com/minio/minio/cmd/http"

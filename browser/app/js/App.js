@@ -15,17 +15,20 @@
  */
 
 import React from "react"
-import { Route, Switch, Redirect } from "react-router-dom"
-import Browser from "./browser/Browser"
+import {Route, Switch} from "react-router-dom"
 import Login from "./browser/Login"
-import web from "./web"
+import {Main} from "./Main";
+import Router from "react-router-dom/Router";
+import history from "./history"
 
 export const App = () => {
   return (
-    <Switch>
-      <Route path={"/login"} component={Login} />
-      <Route path={"/:bucket?/*"} component={Browser} />
-    </Switch>
+    <Router history={history}>
+      <Switch>
+        <Route path={"/login"} component={Login} />
+        <Route path={"/"} component={Main}/>
+      </Switch>
+    </Router>
   )
 }
 

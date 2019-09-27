@@ -15,27 +15,44 @@
  */
 
 import React from "react"
-import { connect } from "react-redux"
-import Alert from "./Alert"
-import * as alertActions from "./actions"
+import {getServerInfo} from "../actions";
+import {connect} from "react-redux";
 
-export const AlertContainer = ({ alert, clearAlert }) => {
-  if (alert && !alert.message) {
-    return ""
+class ServerPage extends React.Component {
+  componentDidMount() {
+    this.props.getServerInfo()
   }
-  return <Alert {...alert} onDismiss={clearAlert} />
+
+  render() {
+    return (
+      <div>
+        <h1>Server Info</h1>
+        <p>mc admin info server here</p>
+        <p>mc admin info cpu here</p>
+        <p>mc admin info network here</p>
+        <pre>{JSON.stringify(this.props.serverInfo,null,2)}</pre>
+      </div>
+    )
+  }
 }
 
 const mapStateToProps = state => {
   return {
-    alert: state.alert
+    serverInfo: state.admin.serverInfo,
   }
 }
 
 const mapDispatchToProps = dispatch => {
   return {
-    clearAlert: () => dispatch(alertActions.clear())
+    getServerInfo: () => dispatch(getServerInfo())
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(AlertContainer)
+
+const ServerPageController = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ServerPage)
+
+
+export {ServerPageController as ServerPage}

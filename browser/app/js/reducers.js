@@ -20,13 +20,15 @@ import alert from "./alert/reducer"
 import buckets from "./buckets/reducer"
 import objects from "./objects/reducer"
 import uploads from "./uploads/reducer"
+import admin from "./admin/reducer"
 
 const rootReducer = combineReducers({
   browser,
   alert,
   buckets,
   objects,
-  uploads
+  uploads,
+  admin
 })
 
 export default rootReducer
