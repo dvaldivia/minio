@@ -15,15 +15,20 @@
  */
 
 import React from "react"
-import { connect } from "react-redux"
+import {connect} from "react-redux"
 import Alert from "./Alert"
 import * as alertActions from "./actions"
+import PropTypes from "prop-types"
 
-export const AlertContainer = ({ alert, clearAlert }) => {
-  if (alert && !alert.message) {
-    return ""
+class AlertContainer extends React.Component {
+  render() {
+    const {alert, clearAlert} = this.props
+
+    if (!alert.message) {
+      return ""
+    }
+    return <Alert {...alert} onDismiss={clearAlert}/>
   }
-  return <Alert {...alert} onDismiss={clearAlert} />
 }
 
 const mapStateToProps = state => {
@@ -38,4 +43,5 @@ const mapDispatchToProps = dispatch => {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(AlertContainer)
+const AlertContainerController = connect(mapStateToProps, mapDispatchToProps)(AlertContainer)
+export {AlertContainerController as AlertContainer}
