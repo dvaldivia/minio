@@ -15,17 +15,44 @@
  */
 
 import React from "react"
+import {fetchUsers} from "../actions";
+import {connect} from "react-redux";
 
-export class UsersPage extends React.Component {
+class UsersPage extends React.Component {
+
+  componentDidMount() {
+    this.props.fetchUsers();
+  }
+
   render() {
     return (
       <div>
         <h1>Users</h1>
         <p>mc users goes here</p>
+        <pre>{JSON.stringify(this.props.users, null, 2)}</pre>
       </div>
     )
   }
 }
 
 
-export default UsersPage
+const mapStateToProps = state => {
+  return {
+    users: state.admin.users,
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    fetchUsers: () => dispatch(fetchUsers())
+  }
+}
+
+
+const UsersPageController = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(UsersPage)
+
+
+export {UsersPageController as UsersPage}

@@ -15,17 +15,43 @@
  */
 
 import React from "react"
+import {fetchGroups, fetchPolicies} from "../actions";
+import {connect} from "react-redux";
 
-export class PoliciesPage extends React.Component {
+class PoliciesPage extends React.Component {
+  componentDidMount() {
+    this.props.fetchPolicies();
+  }
   render() {
     return (
       <div>
         <h1>Policies</h1>
         <p>mc policies here</p>
+        <pre>{JSON.stringify(this.props.policies, null, 2)}</pre>
       </div>
     )
   }
 }
 
+const mapStateToProps = state => {
+  return {
+    policies: state.admin.policies,
+  }
+}
 
-export default PoliciesPage
+const mapDispatchToProps = dispatch => {
+  return {
+    fetchPolicies: () => dispatch(fetchPolicies())
+  }
+}
+
+
+const PoliciesPageController = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(PoliciesPage)
+
+
+export {PoliciesPageController as PoliciesPage}
+
+

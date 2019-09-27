@@ -149,7 +149,7 @@ const MOCK_USERS = {"users": ['a', 'b']}
 
 export const fetchUsers = () => (dispatch) => {
   //TODO: Fetch data from server and dispatch when received
-  dispatch(serverInfoReceived(MOCK_USERS))
+  dispatch(usersReceived(MOCK_USERS))
 }
 
 export const usersReceived = (users) => {

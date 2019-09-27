@@ -17,10 +17,9 @@
 import React from "react"
 import {Redirect, Route, Router, Switch} from "react-router-dom";
 import {ServerPage} from "./server/ServerPage";
-import BucketsPage from "./buckets/BucketPage";
-import UsersPage from "./users/UsersPage";
-import GroupsPage from "./groups/GroupsPage";
-import PoliciesPage from "./policies/PoliciesPage";
+import {UsersPage} from "./users/UsersPage";
+import {GroupsPage} from "./groups/GroupsPage";
+import {PoliciesPage} from "./policies/PoliciesPage";
 import history from "../history";
 class AdminPage extends React.Component {
   render() {
@@ -28,7 +27,6 @@ class AdminPage extends React.Component {
       <div className="fe-body">
         <Router history={history}>
           <Switch>
-            <Route path="/a/buckets" component={BucketsPage}/>
             <Route path="/a/users" component={UsersPage}/>
             <Route path="/a/groups" component={GroupsPage}/>
             <Route path="/a/policies" component={PoliciesPage}/>
