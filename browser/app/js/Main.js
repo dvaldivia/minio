@@ -28,8 +28,8 @@ import {AdminPage} from "./admin/AdminPage";
 class Main extends React.Component {
   componentDidMount() {
     //TODO: Get this value from the server
-    // this.props.setIsAdmin();
-    setTimeout(()=>{this.props.setIsAdmin();},2000)
+    this.props.setIsAdmin();
+    // setTimeout(()=>{this.props.setIsAdmin();},2000)
   }
 
   render() {
