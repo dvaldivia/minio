@@ -138,11 +138,11 @@ const MOCK_SERVER_INFO = {
 
 export const getServerInfo = () => (dispatch) => {
   //TODO: Fetch data from server and dispatch when received
-  dispatch(serverInfoReceived())
+  dispatch(serverInfoReceived(MOCK_SERVER_INFO))
 }
 
-export const serverInfoReceived = () => {
-  return {type: ADM_SERVER_INFO_RECEIVED, info: MOCK_SERVER_INFO}
+export const serverInfoReceived = (info) => {
+  return {type: ADM_SERVER_INFO_RECEIVED, info: info}
 };
 
 const MOCK_USERS = {"users": ['a', 'b']}

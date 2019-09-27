@@ -20,7 +20,8 @@ import {connect} from "react-redux";
 
 class ServerPage extends React.Component {
   componentDidMount() {
-    this.props.getServerInfo()
+    // this.props.getServerInfo()
+    setTimeout(()=>{this.props.getServerInfo()},3000)
   }
 
   render() {
