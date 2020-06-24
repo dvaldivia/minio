@@ -19,7 +19,7 @@ import ObjectsHeader from "./ObjectsHeader"
 import ObjectsListContainer from "./ObjectsListContainer"
 
 export const ObjectsSection = () => (
-  <div>
+  <div className="files-table">
     <ObjectsHeader />
     <ObjectsListContainer />
   </div>

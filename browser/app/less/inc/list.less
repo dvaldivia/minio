@@ -20,8 +20,9 @@
 
 header.fesl-row {
     @media (min-width:(@screen-sm-min - 100px)) {
-        margin-bottom: 20px;
-        border-bottom: 1px solid lighten(@text-muted-color, 20%);
+        //margin-bottom: 20px;
+        //border-bottom: 1px solid lighten(@text-muted-color, 20%);
+
         padding-left: 30px;
 
         .fesl-item,
@@ -32,9 +33,10 @@ header.fesl-row {
 
         .fesl-item {
             cursor: pointer;
-            color: @text-color;
+            //color: @text-color;
             font-weight: 500;
             margin-bottom: -5px;
+            color: #333;
 
             & > .fesli-sort {
                 float: right;
@@ -48,8 +50,9 @@ header.fesl-row {
             }
 
             &:hover:not(.fesl-item-actions) {
-                background: lighten(@text-muted-color, 22%);
-                color: @dark-gray;
+                //background: lighten(@text-muted-color, 22%);
+                //color: @dark-gray;
+              background-color: #fafafa;
 
                 & > .fesli-sort {
                     .opacity(0.5);
@@ -78,6 +81,8 @@ div.fesl-row {
     cursor: default;
     .transition(background-color);
     .transition-duration(500ms);
+    font-size: 13px;
+  //border-bottom: #bababa 1px solid;
 
     @media (max-width: (@screen-xs-max - 100px)) {
         padding: 5px 20px;
@@ -85,7 +90,7 @@ div.fesl-row {
 
     &:not(.fesl-row-selected) {
         &:nth-child(even) {
-            background-color: @list-row-even-bg;
+            background-color: #f9f9f9;
         }
     }
 
@@ -120,11 +125,11 @@ div.fesl-row {
     &[data-type=audio] { .list-type(#009688, '\f1c7'); }
     &[data-type=code] { .list-type(#997867, "\f1c9"); }
     &[data-type=excel] { .list-type(#64c866, '\f1c3'); }
-    &[data-type=image] { .list-type(#f06292, '\f1c5'); }
+    &[data-type=image] { .list-type(#201763, '\f1c5'); }
     &[data-type=video] { .list-type(#f8c363, '\f1c8'); }
     &[data-type=other] { .list-type(#afafaf, '\f15b'); }
     &[data-type=text] { .list-type(#8a8a8a, '\f15c'); }
-    &[data-type=doc] { .list-type(#2196f5, '\f1c2'); }
+    &[data-type=doc] { .list-type(#201763, '\f1c2'); }
     &[data-type=presentation] { .list-type(#896ea6, '\f1c4'); }
 
     &.fesl-loading{
@@ -463,7 +468,7 @@ div.fesl-row {
         .transition(all);
         .transition-duration(300ms);
         margin-left: 10px;
-        
+
         &:hover {
             background-color: @white;
             color: @brand-primary;

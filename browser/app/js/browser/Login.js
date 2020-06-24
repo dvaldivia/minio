@@ -112,6 +112,9 @@ export class Login extends React.Component {
       <div className="login">
         {alertBox}
         <div className="l-wrap">
+          <div className="l-wrap-logo" >
+            <div className="l-wrap-logo-icon" />
+          </div>
           <form onSubmit={this.handleSubmit.bind(this)}>
             <InputGroup
               value={this.state.accessKey}

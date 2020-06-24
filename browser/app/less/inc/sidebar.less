@@ -8,6 +8,7 @@
 	height: 100%;
 	overflow: hidden;
 	padding: 25px;
+  font-size: 12px;
 
 	@media(min-width: @screen-md-min) {
 		.translate3d(0, 0, 0);
@@ -27,10 +28,11 @@
 	}
 
 	a {
-		color: rgba(255, 255, 255, 0.75);
+		//color: rgba(255, 255, 255, 0.75);
+		color: #201763;
 
 		&:hover {
-			color: @white;
+			color: #201763;
 		}
 	}
 }
@@ -39,23 +41,29 @@
     Header
 ----------------------------*/
 .fes-header {
-	margin-bottom: 40px;
+  margin: auto;
+	margin-bottom: 10px;
 
-	img,
-	h2 {
-		float: left;
-	}
+  background-image: url("../../img/minio-browswer_logo.svg");
+  background-repeat: no-repeat;
+  background-position: center center;
+  height: 42px;
+  width: 143px;
 
-	h2 {
-		margin: 6px 0 0 13px;
-		font-weight: normal;
-		color: @white;
-		font-size: 20px;
-	}
+}
 
-	img {
-		width: 20px;
-	}
+.fes-list {
+  .input-group {
+    color: #201763;
+    .ig-text {
+      color: #201763 !important;
+      border-color: #201763 !important;
+    }
+    .ig-text::placeholder {
+      color: rgba(32, 23, 99, 0.72) !important;
+
+    }
+  }
 }
 
 /*--------------------------
@@ -97,10 +105,11 @@
 		}
 
 		&.active {
-			background-color: rgba(0,0,0,0.1);
+			//background-color: rgba(0,0,0,0.1);
+      background: transparent linear-gradient(90deg, #362585 0%, #362585 7%, #281B6F 39%, #1F1661 100%) 0% 0% no-repeat padding-box;
 
 			& > a {
-				color: @white;
+				color: white;
 			}
 		}
 
@@ -108,7 +117,7 @@
 			background-color: rgba(0, 0, 0, 0.05);
 
 			& > a {
-				color: @white;
+				color: #201763;
 			}
 		}
 
@@ -159,7 +168,7 @@
 			a:before {
 				content: none;
 				-webkit-box-shadow: @dropdown-shadow;
-				box-shadow: @dropdown-shadow;	
+				box-shadow: @dropdown-shadow;
 			}
 			&:not(.active):hover {
 				& > a {
